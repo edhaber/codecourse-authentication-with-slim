@@ -83,6 +83,7 @@ class Guard
      * @param null|callable          $failureCallable
      * @param integer                $storageLimit
      * @param integer                $strength
+     * @param boolean                $persistentTokenMode
      * @throws RuntimeException if the session cannot be found
      */
     public function __construct(
@@ -159,6 +160,9 @@ class Guard
         // Generate new CSRF token if persistentTokenMode is false, or if a valid keyPair has not yet been stored
         if (!$this->persistentTokenMode || !$this->loadLastKeyPair()) {
             $request = $this->generateNewToken($request);
+        } elseif ($this->persistentTokenMode) {
+            $pair = $this->loadLastKeyPair() ? $this->keyPair : $this->generateToken();
+            $request = $this->attachRequestAttributes($request, $pair);
         }
 
         // Enforce the storage limit
@@ -172,22 +176,24 @@ class Guard
      * @param $storage
      * @return mixed
      */
-    private function validateStorage()
+    public function validateStorage()
     {
         if (is_array($this->storage)) {
             return $this->storage;
-        } elseif ($this->storage instanceof ArrayAccess) {
-            return $this->storage;
-        } else {
-            if (!isset($_SESSION)) {
-                throw new RuntimeException('CSRF middleware failed. Session not found.');
-            }
-            if (!array_key_exists($this->prefix, $_SESSION)) {
-                $_SESSION[$this->prefix] = [];
-            }
-            $this->storage = &$_SESSION[$this->prefix];
+        }
+
+        if ($this->storage instanceof ArrayAccess) {
             return $this->storage;
         }
+
+        if (!isset($_SESSION)) {
+            throw new RuntimeException('CSRF middleware failed. Session not found.');
+        }
+        if (!array_key_exists($this->prefix, $_SESSION)) {
+            $_SESSION[$this->prefix] = [];
+        }
+        $this->storage = &$_SESSION[$this->prefix];
+        return $this->storage;
     }
 
     /**
@@ -217,14 +223,14 @@ class Guard
      * 
      * @return ServerRequestInterface PSR7 response object.
      */
-    public function generateNewToken(ServerRequestInterface $request) {
+    public function generateNewToken(ServerRequestInterface $request)
+    {
         
         $pair = $this->generateToken();
-        
-        $request = $request->withAttribute($this->prefix . '_name', $pair[$this->prefix . '_name'])
-            ->withAttribute($this->prefix . '_value', $pair[$this->prefix . '_value']);
 
-        return $request;        
+        $request = $this->attachRequestAttributes($request, $pair);
+
+        return $request;
     }
 
     /**
@@ -373,6 +379,17 @@ class Guard
                 unset($this->storage[$iterator->key()]);
             }
         }
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param $pair
+     * @return static
+     */
+    protected function attachRequestAttributes(ServerRequestInterface $request, $pair)
+    {
+        return $request->withAttribute($this->prefix . '_name', $pair[$this->prefix . '_name'])
+            ->withAttribute($this->prefix . '_value', $pair[$this->prefix . '_value']);
     }
 
     /**
