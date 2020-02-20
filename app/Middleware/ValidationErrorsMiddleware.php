@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Middelware;
+namespace App\Middleware;
 
-class ValidationErrorsMiddelware extends Middelware
+class ValidationErrorsMiddleware extends Middleware
 {
 	public function __invoke($request, $response, $next)
 	{

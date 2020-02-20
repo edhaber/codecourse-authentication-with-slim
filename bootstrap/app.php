@@ -92,13 +92,13 @@ $container['csrf'] = function($container){
 };
 
 // give back errors
-$app->add(new \App\Middelware\ValidationErrorsMiddelware($container));
+$app->add(new \App\Middleware\ValidationErrorsMiddleware($container));
 
 // give back the old input
-$app->add(new \App\Middelware\OldInputMiddelware($container));
+$app->add(new \App\Middleware\OldInputMiddleware($container));
 
 // give back a csrf generated key
-$app->add(new \App\Middelware\CsrfViewMiddelware($container));
+$app->add(new \App\Middleware\CsrfViewMiddleware($container));
 
 // run the crsf check
 $app->add($container->csrf);

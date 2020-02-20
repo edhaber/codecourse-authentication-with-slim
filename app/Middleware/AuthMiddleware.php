@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Middelware;
+namespace App\Middleware;
 
-class AuthMiddelware extends Middelware
+class AuthMiddleware extends Middleware
 {
 	public function __invoke($request, $response, $next)
 	{
@@ -13,7 +13,7 @@ class AuthMiddelware extends Middelware
 			return $response->withRedirect($this->container->router->pathFor('home'));
 		}
 
-		// standard middelware
+		// standard Middleware
 		$response = $next($request, $response);
 		return $response;
 	}

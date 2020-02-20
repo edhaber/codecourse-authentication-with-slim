@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Middelware;
+namespace App\Middleware;
 
-class Middelware
+class Middleware
 {
 	protected $container;
 

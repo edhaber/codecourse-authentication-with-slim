@@ -1,7 +1,7 @@
 <?php
 
-use App\Middelware\AuthMiddelware;
-use App\Middelware\GuestMiddelware;
+use App\Middleware\AuthMiddleware;
+use App\Middleware\GuestMiddleware;
 
 $app->get('/', 'HomeController:index')->setName('home');
 
@@ -14,7 +14,7 @@ $app->group('', function(){
 	// signin routes
 	$this->get('/auth/signin', 'AuthController:getSignIn')->setName('auth.signin');
 	$this->post('/auth/signin', 'AuthController:postSignIn');
-})->add(new GuestMiddelware($container));
+})->add(new GuestMiddleware($container));
 
 // when the user isn't signed in
 $app->group('', function(){
@@ -24,5 +24,5 @@ $app->group('', function(){
 	// change password
 	$this->get('/auth/password/change', 'PasswordController:getChangePassword')->setName('auth.password.change');
 	$this->post('/auth/password/change', 'PasswordController:postChangePassword');
-})->add(new AuthMiddelware($container));
+})->add(new AuthMiddleware($container));
 
