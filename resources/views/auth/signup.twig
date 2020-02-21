@@ -3,9 +3,9 @@
 {% block content %}
 	<div class="row">
 		<div class="col-md">
-			<div class="panel panel-default">
-				<div class="panel-heading">Sign Up</div>
-				<div class="panel-body">
+			<div class="card">
+				<div class="card-heading">Sign Up</div>
+				<div class="card-body">
 					<form action="{{ path_for('auth.signup') }}" method="POST" autocomplete="off">
 						<div class="form-group {{ errors.email ? 'has-error' : ''}}">
 							<label for="">Email</label>
@@ -34,7 +34,7 @@
 								</span>
 							{% endif %}
 						</div>
-						<button type="submit" class="btn btn-default">Sign Up</button>
+						<button type="submit" class="btn btn-primary">Sign Up</button>
 
 						{{ csrf.field | raw }}
 					</form>
